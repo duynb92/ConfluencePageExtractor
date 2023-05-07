@@ -266,18 +266,18 @@ const perform = async (z, bundle) => {
     let processedContent = processPageContent(page.title, page.body.storage.value, attachments);
 
     let processedHubSpotPageContent = processHubSpotPageContent(hubSpotPage.body.storage.value);
-
-    if (processHubSpotPageContent.metaDescription == null) {
+    
+    if (processedHubSpotPageContent.metaDescription == null) {
       error.throwError(z, new FieldRequiredError('Meta Description'))
       return;
     }
 
-    if (processHubSpotPageContent.slug == null) {
+    if (processedHubSpotPageContent.slug == null) {
       error.throwError(z, new FieldRequiredError('Slug'))
       return;
     }
 
-    if (processHubSpotPageContent.featuredImageAltText == null) {
+    if (processedHubSpotPageContent.featuredImageAltText == null) {
       error.throwError(z, new FieldRequiredError('Featured Image Alt Text'))
       return;
     }
