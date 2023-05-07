@@ -2,6 +2,7 @@ const hydrators = require('../hydrators.js');
 const { XMLParser, XMLBuilder } = require('fast-xml-parser');
 const error = require('../errors/errors.js');
 const CustomError = error.customError;
+const FieldRequiredError = error.fieldRequiredError;
 
 const perform = async (z, bundle) => {
   function options(preserveOrder) {
@@ -265,13 +266,29 @@ const perform = async (z, bundle) => {
     let processedContent = processPageContent(page.title, page.body.storage.value, attachments);
 
     let processedHubSpotPageContent = processHubSpotPageContent(hubSpotPage.body.storage.value);
+    
+    if (processedHubSpotPageContent.metaDescription == null) {
+      error.throwError(z, new FieldRequiredError('Meta Description'))
+      return;
+    }
+
+    if (processedHubSpotPageContent.slug == null) {
+      error.throwError(z, new FieldRequiredError('Slug'))
+      return;
+    }
+
+    if (processedHubSpotPageContent.featuredImageAltText == null) {
+      error.throwError(z, new FieldRequiredError('Featured Image Alt Text'))
+      return;
+    }
 
     let data = {
       // access_token: bundle.authData.access_token,
       page,
       labels,
       attachments,
-      coverPicture: coverPictureAsAttachment.title,
+      // TODO: remove hard-code
+      coverPicture: `https://24400165.fs1.hubspotusercontent-na1.net/hubfs/24400165/Blogs/${encodeURIComponent(page.title)}/${coverPictureAsAttachment.title}`,
       processedContent: processedContent,
       processedHubSpotPageContent: processedHubSpotPageContent
     };

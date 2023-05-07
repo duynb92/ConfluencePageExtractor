@@ -1,6 +1,7 @@
 /*
 100: Feature Image is required
 101: Feature Image not found
+200: HubSpot Additional Data Field required
 */
 
 class CustomError {
@@ -31,9 +32,33 @@ class CustomError {
     }
 }
 
+
+class FieldRequiredError {
+    constructor(fieldName) {
+        this._fieldName = fieldName
+    }
+
+    get code() {
+        return 200;
+    }
+
+    get fieldName() {
+        return this._fieldName;
+    }
+
+    get category() {
+        return 'HubSpot Additional Data Field required'
+    }
+
+    get message() {
+        return `${this.fieldName} is required`
+    }
+}
+
 module.exports = {
     throwError: (z, errorObj) => {
-        throw new z.errors.Error(errorObj.message, errorObj.category, 100);
+        throw new z.errors.Error(errorObj.message, errorObj.category, errorObj.code);
     },
-    customError: CustomError
+    customError: CustomError,
+    fieldRequiredError: FieldRequiredError
 }
