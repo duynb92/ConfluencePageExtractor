@@ -288,7 +288,7 @@ const perform = async (z, bundle) => {
       labels,
       attachments,
       // TODO: remove hard-code
-      coverPicture: `https://24400165.fs1.hubspotusercontent-na1.net/hubfs/24400165/Blogs/${page.title}/${coverPictureAsAttachment.title}`,
+      coverPicture: `https://24400165.fs1.hubspotusercontent-na1.net/hubfs/24400165/Blogs/${encodeURIComponent(page.title)}/${coverPictureAsAttachment.title}`,
       processedContent: processedContent,
       processedHubSpotPageContent: processedHubSpotPageContent
     };
