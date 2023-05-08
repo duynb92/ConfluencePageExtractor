@@ -1,3 +1,4 @@
+const he = require('he');
 const hydrators = require('../hydrators.js');
 const { XMLParser, XMLBuilder } = require('fast-xml-parser');
 const error = require('../errors/errors.js');
@@ -295,7 +296,8 @@ const perform = async (z, bundle) => {
 
   async function fetchData() {
     const page = await fetchPage(bundle.inputData.page_id);
-
+    const decodedPageContent = he.decode(page.body.storage.value);
+    
     const pageProperties = await fetchPageProperties(bundle.inputData.page_id);
     let coverPicture = pageProperties.find(x => x.key == 'cover-picture-id-published');
     if (coverPicture == null) {
@@ -311,11 +313,13 @@ const perform = async (z, bundle) => {
     }
 
     const labels = await fetchLabelsInPage(bundle.inputData.page_id);
+    
     const hubSpotPage = await fetchHubSpotAdditionalDataPage();
+    const decodedHubSpotPageContent = he.decode(hubSpotPage.body.storage.value);
 
-    let processedContent = processPageContent(page.title, page.body.storage.value, attachments);
+    let processedContent = processPageContent(page.title, decodedPageContent, attachments);
 
-    let processedHubSpotPageContent = processHubSpotPageContent(hubSpotPage.body.storage.value);
+    let processedHubSpotPageContent = processHubSpotPageContent(decodedHubSpotPageContent);
 
     if (processedHubSpotPageContent.metaDescription == null) {
       error.throwError(z, new FieldRequiredError('Meta Description'))

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "fast-xml-parser": "^4.2.2",
+    "he": "^1.2.0",
     "zapier-platform-core": "14.0.0"
   },
   "devDependencies": {
