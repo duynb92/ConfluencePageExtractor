@@ -4,6 +4,8 @@ const { XMLParser, XMLBuilder } = require('fast-xml-parser');
 const error = require('../errors/errors.js');
 const CustomError = error.customError;
 const FieldRequiredError = error.fieldRequiredError;
+const imageHelper = require('../helpers/image_helper.js');
+const tableHelper = require('../helpers/table_helper.js');
 
 const perform = async (z, bundle) => {
   function options(preserveOrder) {
@@ -154,120 +156,17 @@ const perform = async (z, bundle) => {
       ;
   };
 
-  function replaceAcImage(folderName, acImage, attachments) {
-    let attachmentAttributes = acImage['ac:image'][0][':@'];
-      let imageAttributes = acImage[':@'];
-      let fileName = attachmentAttributes['@_ri:filename'];
-      // TODO: how to remove hard-code?
-      let url = `https://24400165.fs1.hubspotusercontent-na1.net/hubfs/24400165/Blogs/${encodeURIComponent(folderName)}/${fileName}`
-      let attachmentId = attachments.find(x => x.title == fileName).id;
-      let width = imageAttributes['@_ac:width'] ? imageAttributes['@_ac:width'] : imageAttributes['@_ac:original-width'];
-      let height = imageAttributes['@_ac:height'] ? imageAttributes['@_ac:height'] : imageAttributes['@_ac:original-height'];
-      let altText = imageAttributes['@_ac:alt'] ? imageAttributes['@_ac:alt'] : fileName.replace(/\.[^/.]+$/, "")
-      return {
-        'p': [
-          {
-            'img': [],
-            ':@': {
-              '@_confluenceAttachmentId': attachmentId,
-              '@_src': url,
-              '@_alt': altText,
-              '@_width': width,
-              '@_height': height,
-              '@_loading': 'lazy',
-              '@_style': `height: auto; max-width: 100%; width: ${width}px;`
-            }
-          }
-        ],
-      }
-  }
-
-  function replaceAcImages(folderName, xmlElements, acImages, attachments) {
-    acImages.forEach(element => {
-      let attachmentAttributes = element['ac:image'][0][':@'];
-      let imageAttributes = element[':@'];
-      let fileName = attachmentAttributes['@_ri:filename'];
-      // TODO: how to remove hard-code?
-      let url = `https://24400165.fs1.hubspotusercontent-na1.net/hubfs/24400165/Blogs/${encodeURIComponent(folderName)}/${fileName}`
-      let attachmentId = attachments.find(x => x.title == fileName).id;
-      let width = imageAttributes['@_ac:width'] ? imageAttributes['@_ac:width'] : imageAttributes['@_ac:original-width'];
-      let height = imageAttributes['@_ac:height'] ? imageAttributes['@_ac:height'] : imageAttributes['@_ac:original-height'];
-      let altText = imageAttributes['@_ac:alt'] ? imageAttributes['@_ac:alt'] : fileName.replace(/\.[^/.]+$/, "")
-      let index = xmlElements.indexOf(element);
-      if (index !== -1) {
-        xmlElements[index] = {
-          'p': [
-            {
-              'img': [],
-              ':@': {
-                '@_confluenceAttachmentId': attachmentId,
-                '@_src': url,
-                '@_alt': altText,
-                '@_width': width,
-                '@_height': height,
-                '@_loading': 'lazy',
-                '@_style': `height: auto; max-width: 100%; width: ${width}px;`
-              }
-            }
-          ],
-        }
-      }
-    });
-  }
-
-  function addTHeadToTables(xmlElements) {
-    const allTables = xmlElements.filter(x => x['table'] != null);
-    allTables.forEach(table => {
-      let tableElement = table['table'];
-      let tBodies = tableElement.find(x => x['tbody'] != null)['tbody'];
-      let firstRow = tBodies[0]['tr'];
-      let hasHeader = firstRow.find(x => x['th'] != null);
-      if (hasHeader) {
-        let tHead = { thead: firstRow };
-
-        // Insert thead right after colgroup
-        let colGroupIndex = tableElement.indexOf(tableElement.find(x => x['colgroup'] != null));
-        tableElement.splice(colGroupIndex + 1, 0, tHead);
-
-        // Remove first row from tBodies
-        tBodies.splice(0, 1);
-      }
-    });
-  }
-
   function parseXml(pageContent, preserveOrder) {
     const parser = new XMLParser(options(preserveOrder));
     return parser.parse(pageContent);
   }
 
-  function replaceAcImages(folderName, elements, attachments) {
-    var results = []
-    let acImages = elements.filter(x => x['ac:image'] != null);
-    if (acImages.length > 0) {
-      acImages.forEach(acImage => {
-        let p = replaceAcImage(folderName, acImage, attachments);
-        let index = elements.indexOf(acImage);
-        if (index !== -1) {
-          elements[index] = p;
-        }
-      });
-      results.push(...acImages);
-    }
-    elements.forEach(element => {
-      let key = Object.keys(element)[0];
-      if (Array.isArray(element[key])) {
-        results.push(...replaceAcImages(folderName, element[key], attachments));
-      }
-    })
-    return results;
-  }
-
   function processPageContent(folderName, pageContent, attachments) {
     const xmlElements = parseXml(pageContent, true);
 
-    addTHeadToTables(xmlElements);
-    replaceAcImages(folderName, xmlElements, attachments);
-    
+    tableHelper.addTHeadToTables(xmlElements);
+    imageHelper.replaceAcImages(folderName, xmlElements, attachments);
+
     const builder = new XMLBuilder(options(true));
     let newXml = builder.build(xmlElements);
     // z.console.log(newXml);
@@ -297,7 +196,7 @@ const perform = async (z, bundle) => {
   async function fetchData() {
     const page = await fetchPage(bundle.inputData.page_id);
     const decodedPageContent = he.decode(page.body.storage.value);
-    
+
     const pageProperties = await fetchPageProperties(bundle.inputData.page_id);
     let coverPicture = pageProperties.find(x => x.key == 'cover-picture-id-published');
     if (coverPicture == null) {
@@ -313,7 +212,7 @@ const perform = async (z, bundle) => {
     }
 
     const labels = await fetchLabelsInPage(bundle.inputData.page_id);
-    
+
     const hubSpotPage = await fetchHubSpotAdditionalDataPage();
     const decodedHubSpotPageContent = he.decode(hubSpotPage.body.storage.value);
 
