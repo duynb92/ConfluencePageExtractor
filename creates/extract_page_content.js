@@ -163,13 +163,14 @@ const perform = async (z, bundle) => {
 
   function processPageContent(folderName, pageContent, attachments) {
     const xmlElements = parseXml(pageContent, true);
-
+    // z.console.log(xmlElements);
     tableHelper.addTHeadToTables(xmlElements);
     imageHelper.replaceAcImages(folderName, xmlElements, attachments);
+    replaceEmbeddedVideos(xmlElements);
 
     const builder = new XMLBuilder(options(true));
     let newXml = builder.build(xmlElements);
-    // z.console.log(newXml);
+    z.console.log(newXml);
 
     return newXml;
   }
@@ -245,7 +246,7 @@ const perform = async (z, bundle) => {
       processedContent: processedContent,
       processedHubSpotPageContent: processedHubSpotPageContent
     };
-    z.console.log(data);
+    // z.console.log(data);
     return data;
   }
 
