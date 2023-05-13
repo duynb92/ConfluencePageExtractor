@@ -6,6 +6,7 @@ const CustomError = error.customError;
 const FieldRequiredError = error.fieldRequiredError;
 const imageHelper = require('../helpers/image_helper.js');
 const tableHelper = require('../helpers/table_helper.js');
+const videoHelper = require('../helpers/video_helper.js');
 
 const perform = async (z, bundle) => {
   function options(preserveOrder) {
@@ -166,7 +167,7 @@ const perform = async (z, bundle) => {
     // z.console.log(xmlElements);
     tableHelper.addTHeadToTables(xmlElements);
     imageHelper.replaceAcImages(folderName, xmlElements, attachments);
-    replaceEmbeddedVideos(xmlElements);
+    videoHelper.replaceEmbeddedVideos(xmlElements);
 
     const builder = new XMLBuilder(options(true));
     let newXml = builder.build(xmlElements);
