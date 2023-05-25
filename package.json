@@ -1,10 +1,10 @@
 {
-  "name": "confluence-page-extractor",
-  "version": "1.0.3",
-  "description": "ConfluencePageExtractor",
+  "name": "atlassian-toolbox",
+  "version": "1.0.2",
+  "description": "atlassian toolbox",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive -t 10000"
+    "test": "mocha --recursive -t 10000 'extract_issue_content'"
   },
   "engines": {
     "node": ">=v16",
