@@ -4,6 +4,7 @@
 200: HubSpot Additional Data Field required
 300: JIRA issue not found
 301: Account custom field does not have any values
+302: Account custom field ID is invalid
 */
 
 class CustomError {
@@ -34,6 +35,8 @@ class CustomError {
                 return 'JIRA issue not found';
             case 301:
                 return 'Account custom field does not have any values';
+            case 302:
+                return 'Account custom field ID is invalid';
             default:
                 return 'Undefine error message';
         }

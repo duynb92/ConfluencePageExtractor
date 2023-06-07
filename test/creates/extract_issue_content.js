@@ -16,7 +16,7 @@ describe('Create - extract_issue_content', () => {
       },
 
       inputData: {
-        issue_key: 'CONTENT-3',
+        issue_key: 'CONTENT-2',
         site_id: 'c74b7111-8d83-4833-8b36-dcebb57fae89',
         account_field_id: '10202'
       },

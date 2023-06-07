@@ -1,3 +1,4 @@
+const hydrators = require('../hydrators.js');
 const error = require('../errors/errors.js');
 const CustomError = error.customError;
 
@@ -20,6 +21,16 @@ const perform = async (z, bundle) => {
         })
     };
 
+    function processAttachments(attachments) {
+        return attachments.map((obj) => {
+            obj.stashedUrl = z.dehydrateFile(hydrators.downloadFileWithAuth, {
+              fileUrl: obj.url,
+              access_token: bundle.authData.access_token
+            });
+            return obj;
+          });
+    }
+
     const fetchIssue = async (key, field_ids) => {
         let issue = await fetchIssueRequest(key, field_ids)
             .then(res => {
@@ -33,13 +44,21 @@ const perform = async (z, bundle) => {
                 return {
                     descriptionText: res.json.renderedFields.description,
                     accounts: res.json.fields[account_field_id].map(x => x.value),
-                    attachments: res.json.fields['attachment'].map(x => x.content)
+                    attachments: res.json.fields['attachment'].map(x => {
+                        return {
+                            url: x.content
+                        }
+                    })
                 }
             });
         return issue;
     }
 
     async function main() {
+        let isNum = /^\d+$/.test(bundle.inputData.account_field_id);
+        if (!isNum) {
+            error.throwError(z, new CustomError(302))
+        }
         let field_ids = ['description', 'attachment', `customfield_${bundle.inputData.account_field_id}`]
         const issue = await fetchIssue(bundle.inputData.issue_key, field_ids);
         if (issue == null) {
@@ -47,13 +66,15 @@ const perform = async (z, bundle) => {
         }
         console.log(issue);
 
-        // processAttachments(issue.attachment)
+        processAttachments(issue.attachments);
 
         // processDescription(issue.description.content)
-        return {
+        let data = {
             token: bundle.authData.access_token,
             issue
         };
+        z.console.log(data);
+        return data;
     }
     return main();
 };
