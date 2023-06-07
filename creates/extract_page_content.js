@@ -6,6 +6,7 @@ const CustomError = error.customError;
 const FieldRequiredError = error.fieldRequiredError;
 const imageHelper = require('../helpers/image_helper.js');
 const tableHelper = require('../helpers/table_helper.js');
+const videoHelper = require('../helpers/video_helper.js');
 
 const perform = async (z, bundle) => {
   function options(preserveOrder) {
@@ -163,13 +164,14 @@ const perform = async (z, bundle) => {
 
   function processPageContent(folderName, pageContent, attachments) {
     const xmlElements = parseXml(pageContent, true);
-
+    // z.console.log(xmlElements);
     tableHelper.addTHeadToTables(xmlElements);
     imageHelper.replaceAcImages(folderName, xmlElements, attachments);
+    videoHelper.replaceEmbeddedVideos(xmlElements);
 
     const builder = new XMLBuilder(options(true));
     let newXml = builder.build(xmlElements);
-    // z.console.log(newXml);
+    z.console.log(newXml);
 
     return newXml;
   }
@@ -245,7 +247,7 @@ const perform = async (z, bundle) => {
       processedContent: processedContent,
       processedHubSpotPageContent: processedHubSpotPageContent
     };
-    z.console.log(data);
+    // z.console.log(data);
     return data;
   }
 
