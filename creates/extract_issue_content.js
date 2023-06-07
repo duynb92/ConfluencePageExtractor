@@ -1,5 +1,9 @@
+const error = require('../errors/errors.js');
+const CustomError = error.customError;
+
 const perform = async (z, bundle) => {
-    const baseUrl = `https://api.atlassian.com/ex/jira/${bundle.inputData.site_id}`;
+    const site_id = bundle.inputData.site_id.split(" ")[0].trim();
+    const baseUrl = `https://api.atlassian.com/ex/jira/${site_id}`;
 
     function fetchIssueRequest(key, field_ids) {
         return z.request({
@@ -10,31 +14,44 @@ const perform = async (z, bundle) => {
                 Authorization: `Bearer ${bundle.authData.access_token}`,
             },
             params: {
-                fields: field_ids.join()
+                fields: field_ids.join(),
+                expand: 'renderedFields'
             }
-        }
-        )
+        })
     };
 
-    const fetchIssue = (key, field_ids) => {
-        return fetchIssueRequest(key, field_ids)
+    const fetchIssue = async (key, field_ids) => {
+        let issue = await fetchIssueRequest(key, field_ids)
             .then(res => {
                 res.throwForStatus();
-                return res.json;
-            })
+                z.console.log(res.json);
+                let account_field_id = field_ids.find(x => x.includes('customfield_'));
+                if (res.json.fields[account_field_id] == null) {
+                    error.throwError(z, new CustomError(301));
+                    return null;
+                }
+                return {
+                    descriptionText: res.json.renderedFields.description,
+                    accounts: res.json.fields[account_field_id].map(x => x.value),
+                    attachments: res.json.fields['attachment'].map(x => x.content)
+                }
+            });
+        return issue;
     }
 
     async function main() {
-        let field_ids = ['description', `${bundle.inputData.account_field_id}`]
+        let field_ids = ['description', 'attachment', `customfield_${bundle.inputData.account_field_id}`]
         const issue = await fetchIssue(bundle.inputData.issue_key, field_ids);
         if (issue == null) {
-            // throw error
+            error.throwError(z, new CustomError(300))
         }
         console.log(issue);
-        processAttachments(issue.attachment)
 
-        processDescription(issue.description.content)
+        // processAttachments(issue.attachment)
+
+        // processDescription(issue.description.content)
         return {
+            token: bundle.authData.access_token,
             issue
         };
     }

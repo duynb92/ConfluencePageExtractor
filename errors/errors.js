@@ -2,6 +2,8 @@
 100: Feature Image is required
 101: Feature Image not found
 200: HubSpot Additional Data Field required
+300: JIRA issue not found
+301: Account custom field does not have any values
 */
 
 class CustomError {
@@ -15,7 +17,9 @@ class CustomError {
 
     get category() {
         if (this._code <= 199) {
-            return 'InvalidData';
+            return 'Confluence-InvalidData';
+        } else if (this._code <= 399) {
+            return 'Jira-InvalidData';
         }
         return 'Undefined error category';
     }
@@ -26,6 +30,10 @@ class CustomError {
                 return 'Feature Image is required';
             case 101:
                 return 'Feature Image not found';
+            case 300:
+                return 'JIRA issue not found';
+            case 301:
+                return 'Account custom field does not have any values';
             default:
                 return 'Undefine error message';
         }
