@@ -47,6 +47,6 @@ module.exports = {
     },
     enablePkce: false,
     autoRefresh: true,
-    scope: 'read:page:confluence read:attachment:confluence offline_access read:issue:jira read:attachment:jira',
+    scope: 'read:page:confluence read:attachment:confluence offline_access read:jira-work',
   },
 };
