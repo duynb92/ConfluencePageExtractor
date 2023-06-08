@@ -5,6 +5,7 @@
 300: JIRA issue not found
 301: Account custom field does not have any values
 302: Account custom field ID is invalid
+303: Description field is required
 */
 
 class CustomError {
@@ -37,6 +38,8 @@ class CustomError {
                 return 'Account custom field does not have any values';
             case 302:
                 return 'Account custom field ID is invalid';
+            case 303:
+                return 'Description field is required';
             default:
                 return 'Undefine error message';
         }

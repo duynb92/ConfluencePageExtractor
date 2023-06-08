@@ -1,5 +1,6 @@
 const hydrators = require('../hydrators.js');
 const error = require('../errors/errors.js');
+const stringHelper = require('../helpers/string_helper.js');
 const CustomError = error.customError;
 
 const perform = async (z, bundle) => {
@@ -31,6 +32,10 @@ const perform = async (z, bundle) => {
           });
     }
 
+    function processDescription(input) {
+        return JSON.stringify(stringHelper.stripHtmlTags(input))
+    }
+
     const fetchIssue = async (key, field_ids) => {
         let issue = await fetchIssueRequest(key, field_ids)
             .then(res => {
@@ -43,7 +48,13 @@ const perform = async (z, bundle) => {
                 }
                 return {
                     descriptionText: res.json.renderedFields.description,
-                    accounts: res.json.fields[account_field_id].map(x => x.value),
+                    accounts: res.json.fields[account_field_id].map(x => {
+                        let splits = x.value.split('-');
+                        return {
+                            accountType: splits[0].trim(),
+                            accountName: splits[1].trim()
+                        }
+                    }),
                     attachments: res.json.fields['attachment'].map(x => {
                         return {
                             url: x.content
@@ -61,14 +72,23 @@ const perform = async (z, bundle) => {
         }
         let field_ids = ['description', 'attachment', `customfield_${bundle.inputData.account_field_id}`]
         const issue = await fetchIssue(bundle.inputData.issue_key, field_ids);
+        console.log(issue);
         if (issue == null) {
             error.throwError(z, new CustomError(300))
         }
-        console.log(issue);
+        if (issue.descriptionText == null) {
+            error.throwError(z, new CustomError(303))
+        }
 
-        processAttachments(issue.attachments);
+        issue.descriptionText = processDescription(issue.descriptionText);
 
-        // processDescription(issue.description.content)
+        // Check if content has any hyperlink
+        if(stringHelper.checkHyperlinks(issue.descriptionText)) {
+            issue.attachments = []
+        } else {
+            processAttachments(issue.attachments);
+        }
+
         let data = {
             token: bundle.authData.access_token,
             issue
