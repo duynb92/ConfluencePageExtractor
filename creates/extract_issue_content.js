@@ -79,6 +79,9 @@ const perform = async (z, bundle) => {
         if (issue.descriptionText == null) {
             error.throwError(z, new CustomError(303))
         }
+        if (issue.attachments.length > 1) {
+            error.throwError(z, new CustomError(304))
+        }
 
         issue.descriptionText = processDescription(issue.descriptionText);
 
