@@ -1,5 +1,4 @@
 const siteOutputFields = async (z, bundle) => {
-  z.console.log("here");
    const response = await z.request({
     url: 'https://api.atlassian.com/oauth/token/accessible-resources',
     method: 'GET',
@@ -11,7 +10,6 @@ const siteOutputFields = async (z, bundle) => {
   })
     .then(response => {
       let json = response.json;
-      z.console.log(json);
       let result = json.map(x=> {
         let isJira = x.scopes.find(x => x.includes('jira')) != null;
         var id = x.id;

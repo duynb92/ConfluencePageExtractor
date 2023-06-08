@@ -57,6 +57,9 @@ const perform = async (z, bundle) => {
                     }),
                     attachments: res.json.fields['attachment'].map(x => {
                         return {
+                            id: x.id,
+                            name: x.filename,
+                            mimeType: x.mimeType,
                             url: x.content
                         }
                     })
