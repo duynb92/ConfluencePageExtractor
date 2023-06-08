@@ -60,7 +60,8 @@ const perform = async (z, bundle) => {
                             id: x.id,
                             name: x.filename,
                             mimeType: x.mimeType,
-                            url: x.content
+                            url: x.content,
+                            hubspotUrl: `https://24400165.fs1.hubspotusercontent-na1.net/hubfs/24400165/${encodeURIComponent('Social posts')}/${encodeURIComponent(key)}/${x.filename}`
                         }
                     })
                 }
