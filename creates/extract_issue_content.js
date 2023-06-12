@@ -33,7 +33,6 @@ const perform = async (z, bundle) => {
     }
 
     function processDescription(input) {
-        // return JSON.stringify(stringHelper.stripHtmlTags(input))
         return stringHelper.stripHtmlTags(input)
     }
 
@@ -84,18 +83,13 @@ const perform = async (z, bundle) => {
         if (issue.descriptionText == null) {
             error.throwError(z, new CustomError(303))
         }
-        if (issue.attachments.length > 1) {
+        if (issue.attachments.length > 4) {
             error.throwError(z, new CustomError(304))
         }
 
         issue.descriptionText = processDescription(issue.descriptionText);
 
-        // Check if content has any hyperlink
-        if(stringHelper.checkHyperlinks(issue.descriptionText)) {
-            issue.attachments = []
-        } else {
-            processAttachments(issue.attachments);
-        }
+        processAttachments(issue.attachments);
 
         let data = {
             token: bundle.authData.access_token,

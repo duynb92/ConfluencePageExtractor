@@ -6,7 +6,7 @@
 301: Account custom field does not have any values
 302: Account custom field ID is invalid
 303: Description field is required
-304: Too many attachments found. Right now HubSpot doesn't support more than 1 attachment.
+304: Too many attachments found. Right now HubSpot does not support more than 4 attachments.
 */
 
 class CustomError {
@@ -42,7 +42,7 @@ class CustomError {
             case 303:
                 return 'Description field is required';
             case 304:
-                return 'Too many attachments found. Right now HubSpot does not support more than 1 attachment.'
+                return 'Too many attachments found. Right now HubSpot does not support more than 4 attachments';
             default:
                 return 'Undefine error message';
         }
