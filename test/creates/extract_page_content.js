@@ -16,7 +16,7 @@ describe('Create - extract_page_content', () => {
       },
 
       inputData: {
-        page_id: 171081838,
+        page_id: 181141511,
         site_id: 'c74b7111-8d83-4833-8b36-dcebb57fae89'
       },
     };

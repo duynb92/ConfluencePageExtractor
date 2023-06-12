@@ -196,6 +196,8 @@ const perform = async (z, bundle) => {
   }
 
   async function fetchData() {
+    const issueKey = bundle.inputData.issue_key;
+
     const page = await fetchPage(bundle.inputData.page_id);
     const decodedPageContent = he.decode(page.body.storage.value);
 
@@ -218,7 +220,7 @@ const perform = async (z, bundle) => {
     const hubSpotPage = await fetchHubSpotAdditionalDataPage();
     const decodedHubSpotPageContent = he.decode(hubSpotPage.body.storage.value);
 
-    let processedContent = processPageContent(page.title, decodedPageContent, attachments);
+    let processedContent = processPageContent(issueKey, decodedPageContent, attachments);
 
     let processedHubSpotPageContent = processHubSpotPageContent(decodedHubSpotPageContent);
 
@@ -237,13 +239,14 @@ const perform = async (z, bundle) => {
       return;
     }
 
+    let coverPictureUrl = imageHelper.generateHubSpotImageUrl(issueKey, coverPictureAsAttachment.title)
     let data = {
       // access_token: bundle.authData.access_token,
       page,
       labels,
       attachments,
       // TODO: remove hard-code
-      coverPicture: `https://24400165.fs1.hubspotusercontent-na1.net/hubfs/24400165/Blogs/${encodeURIComponent(page.title)}/${coverPictureAsAttachment.title}`,
+      coverPicture: coverPictureUrl,
       processedContent: processedContent,
       processedHubSpotPageContent: processedHubSpotPageContent
     };
@@ -266,6 +269,16 @@ module.exports = {
   },
   operation: {
     inputFields: [
+      {
+        key: 'issue_key',
+        label: 'JIRA Issue key',
+        type: 'string',
+        helpText:
+          'Key of JIRA issue, usually in format PROJ-123',
+        required: true,
+        list: false,
+        altersDynamicFields: false,
+      },
       {
         key: 'page_id',
         label: 'Page ID',
