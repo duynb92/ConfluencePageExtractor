@@ -14,7 +14,8 @@ const perform = async (z, bundle) => {
       ignoreAttributes: false,
       preserveOrder: preserveOrder,
       allowBooleanAttributes: true,
-      alwaysCreateTextNode: true
+      alwaysCreateTextNode: true,
+      trimValues: false
     };
   };
 
