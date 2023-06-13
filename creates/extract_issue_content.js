@@ -33,7 +33,7 @@ const perform = async (z, bundle) => {
     }
 
     function processDescription(input) {
-        return stringHelper.stripHtmlTags(input)
+        return stringHelper.stripHtmlTags(input).trim();
     }
 
     const fetchIssue = async (key, field_ids) => {
