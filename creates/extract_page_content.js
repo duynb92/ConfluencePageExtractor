@@ -165,9 +165,10 @@ const perform = async (z, bundle) => {
 
   function processPageContent(folderName, pageContent, attachments) {
     const xmlElements = parseXml(pageContent, true);
-    // z.console.log(xmlElements);
+    // z.console.log(xmlElements.filter(x => x['h4'] != null)[0]['h4'][0]['strong']);
     tableHelper.addTHeadToTables(xmlElements);
     imageHelper.replaceAcImages(folderName, xmlElements, attachments);
+    imageHelper.replaceAcEmoticons(folderName, xmlElements, attachments);
     videoHelper.replaceEmbeddedVideos(xmlElements);
 
     const builder = new XMLBuilder(options(true));
