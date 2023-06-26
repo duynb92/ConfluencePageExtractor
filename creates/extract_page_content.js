@@ -18,8 +18,9 @@ const perform = async (z, bundle) => {
       trimValues: false
     };
   };
-
-  const baseUrl = `https://api.atlassian.com/ex/confluence/${bundle.inputData.site_id}`;
+  
+  const site_id = bundle.inputData.site_id.split(" ")[0].trim();
+  const baseUrl = `https://api.atlassian.com/ex/confluence/${site_id}`;
 
   function fetchPageRequest(id) {
     return z.request({
