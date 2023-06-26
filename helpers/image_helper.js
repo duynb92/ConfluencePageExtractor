@@ -2,7 +2,6 @@ function replaceAcImage(folderName, acImage, attachments) {
   let attachmentAttributes = acImage['ac:image'][0][':@'];
   let imageAttributes = acImage[':@'];
   let fileName = attachmentAttributes['@_ri:filename'];
-  // TODO: how to remove hard-code?
   let url = generateHubSpotImageUrl(folderName, fileName);
   let attachmentId = attachments.find(x => x.title == fileName).id;
   let width = imageAttributes['@_ac:width'] ? imageAttributes['@_ac:width'] : imageAttributes['@_ac:original-width'];
@@ -26,6 +25,7 @@ function replaceAcImage(folderName, acImage, attachments) {
   }
 }
 
+// TODO: how to remove hard-code?
 function generateHubSpotImageUrl(folderName, fileName) {
   return `https://24400165.fs1.hubspotusercontent-na1.net/hubfs/24400165/Blogs/${encodeURIComponent(folderName)}/${encodeURIComponent(fileName)}`
 }
@@ -52,7 +52,30 @@ function replaceAcImages(folderName, elements, attachments) {
   return results;
 }
 
+function replaceAcEmoticons(folderName, elements, attachments) {
+  var results = []
+  let acEmoticons = elements.filter(x => x['ac:emoticon'] != null);
+  if (acEmoticons.length > 0) {
+    acEmoticons.forEach(acEmoticon => {
+      let emoji = acEmoticon[':@']['@_ac:emoji-fallback'];
+      let index = elements.indexOf(acEmoticon);
+      if (index !== -1) {
+        elements[index] = { '#text': emoji };
+      }
+    });
+    results.push(...acEmoticons);
+  }
+  elements.forEach(element => {
+    let key = Object.keys(element)[0];
+    if (Array.isArray(element[key])) {
+      results.push(...replaceAcEmoticons(folderName, element[key], attachments));
+    }
+  })
+  return results;
+}
+
 module.exports = {
   replaceAcImages: replaceAcImages,
+  replaceAcEmoticons: replaceAcEmoticons,
   generateHubSpotImageUrl: generateHubSpotImageUrl
 }
