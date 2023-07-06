@@ -1,6 +1,7 @@
 const hydrators = require('../hydrators.js');
 const error = require('../errors/errors.js');
 const stringHelper = require('../helpers/string_helper.js');
+const he = require('he');
 const CustomError = error.customError;
 
 const perform = async (z, bundle) => {
@@ -33,14 +34,14 @@ const perform = async (z, bundle) => {
     }
 
     function processDescription(input) {
-        return stringHelper.stripHtmlTags(input).trim();
+        let trimText = stringHelper.stripHtmlTags(input).trim();
+        return he.decode(trimText);
     }
 
     const fetchIssue = async (key, field_ids) => {
         let issue = await fetchIssueRequest(key, field_ids)
             .then(res => {
                 res.throwForStatus();
-                z.console.log(res.json);
                 let account_field_id = field_ids.find(x => x.includes('customfield_'));
                 if (res.json.fields[account_field_id] == null) {
                     error.throwError(z, new CustomError(301));
@@ -76,7 +77,7 @@ const perform = async (z, bundle) => {
         }
         let field_ids = ['description', 'attachment', `customfield_${bundle.inputData.account_field_id}`]
         const issue = await fetchIssue(bundle.inputData.issue_key, field_ids);
-        console.log(issue);
+        
         if (issue == null) {
             error.throwError(z, new CustomError(300))
         }
