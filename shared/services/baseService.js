@@ -16,8 +16,6 @@ class BaseService {
   }
 
   async callApi({ url, method = "GET", params, data }) {
-    config["headers"] = this.headers;
-    if (this.auth) config["auth"] = this.auth;
     try {
       const resp = await z.request({
         url: url,

@@ -94,7 +94,10 @@ const perform = async (z, bundle) => {
             id: x.id,
             fileId: x.fileId,
             title: x.title,
-            url: `${baseUrl}/wiki/rest/api/content/${bundle.inputData.page_id}/child/attachment/${x.id}/download`,
+            url: confluenceService.getAttachmentUrlDownload({
+              pageId: bundle.inputData.page_id,
+              attachmentId: x.id,
+            }),
           };
         });
 
