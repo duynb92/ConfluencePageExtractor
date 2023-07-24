@@ -22,8 +22,7 @@ const perform = async (z, bundle) => {
     };
   }
 
-  const site_id = bundle.inputData.site_id.split(" ")[0].trim();
-  const baseUrl = `https://api.atlassian.com/ex/confluence/${site_id}`;
+  const siteId = bundle.inputData.site_id.split(" ")[0].trim();
 
   const confluenceService = new ConfluenceService(
     z,
