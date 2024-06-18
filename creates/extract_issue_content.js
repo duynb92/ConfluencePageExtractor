@@ -2,6 +2,7 @@ const hydrators = require('../hydrators.js');
 const error = require('../errors/errors.js');
 const stringHelper = require('../helpers/string_helper.js');
 const he = require('he');
+const { removeVietnameseTones } = require('../helpers/image_helper.js');
 const CustomError = error.customError;
 
 const perform = async (z, bundle) => {
@@ -57,12 +58,13 @@ const perform = async (z, bundle) => {
                         }
                     }),
                     attachments: res.json.fields['attachment'].map(x => {
+                        const fileNameWithoutTones = removeVietnameseTones(x.filename);
                         return {
                             id: x.id,
-                            name: x.filename,
+                            name: fileNameWithoutTones,
                             mimeType: x.mimeType,
                             url: x.content,
-                            hubspotUrl: `https://24400165.fs1.hubspotusercontent-na1.net/hubfs/24400165/${encodeURIComponent('Social posts')}/${encodeURIComponent(key)}/${encodeURIComponent(x.filename)}`
+                            hubspotUrl: `https://24400165.fs1.hubspotusercontent-na1.net/hubfs/24400165/${encodeURIComponent('Social posts')}/${encodeURIComponent(key)}/${encodeURIComponent(fileNameWithoutTones)}`
                         }
                     })
                 }
