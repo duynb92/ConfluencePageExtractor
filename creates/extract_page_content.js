@@ -126,7 +126,7 @@ const perform = async (z, bundle) => {
       const attachmentObjects = results.results
         .map(
           (x) => {
-            if(string_helper.checkIsVietnameseCharacter(x.filename)) {
+            if(string_helper.containsVietnameseCharacter(x.filename)) {
               error.throwError(z, new AttachmentNameError(x.filename));
             }
             return {
