@@ -7,6 +7,7 @@
 302: Account custom field ID is invalid
 303: Description field is required
 304: Too many attachments found. Right now HubSpot does not support more than 4 attachments.
+305: Attachment name is not valid
 */
 
 class CustomError {
@@ -72,10 +73,33 @@ class FieldRequiredError {
     }
 }
 
+class AttachmentNameError {
+    constructor(string) {
+        this._string = string
+    }
+
+    get code() {
+        return 305;
+    }
+
+    get string() {
+        return this._string;
+    }
+
+    get category() {
+        return 'Attachment name is not valid'
+    }
+
+    get message() {
+        return `"${this.string}" is not valid`
+    }
+}
+
 module.exports = {
     throwError: (z, errorObj) => {
         throw new z.errors.Error(errorObj.message, errorObj.category, errorObj.code);
     },
     customError: CustomError,
-    fieldRequiredError: FieldRequiredError
+    fieldRequiredError: FieldRequiredError,
+    attachmentNameError: AttachmentNameError
 }

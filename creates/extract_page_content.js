@@ -4,9 +4,11 @@ const { XMLParser, XMLBuilder } = require('fast-xml-parser');
 const error = require('../errors/errors.js');
 const CustomError = error.customError;
 const FieldRequiredError = error.fieldRequiredError;
+const AttachmentNameError = error.attachmentNameError;
 const imageHelper = require('../helpers/image_helper.js');
 const tableHelper = require('../helpers/table_helper.js');
 const videoHelper = require('../helpers/video_helper.js');
+const string_helper = require('../helpers/string_helper.js');
 
 const perform = async (z, bundle) => {
   function options(preserveOrder) {
@@ -124,6 +126,9 @@ const perform = async (z, bundle) => {
       const attachmentObjects = results.results
         .map(
           (x) => {
+            if(string_helper.containsVietnameseCharacter(x.filename)) {
+              error.throwError(z, new AttachmentNameError(x.filename));
+            }
             return {
               id: x.id,
               fileId: x.fileId,
