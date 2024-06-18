@@ -127,7 +127,7 @@ const perform = async (z, bundle) => {
             return {
               id: x.id,
               fileId: x.fileId,
-              title: x.title,
+              title: imageHelper.removeVietnameseTones(x.title),
               url: `${baseUrl}/wiki/rest/api/content/${bundle.inputData.page_id}/child/attachment/${x.id}/download`
             }
           }
