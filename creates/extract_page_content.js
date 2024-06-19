@@ -126,9 +126,6 @@ const perform = async (z, bundle) => {
       const attachmentObjects = results.results
         .map(
           (x) => {
-            if(string_helper.containsVietnameseCharacter(x.filename)) {
-              error.throwError(z, new AttachmentNameError(x.filename));
-            }
             return {
               id: x.id,
               fileId: x.fileId,
@@ -137,6 +134,12 @@ const perform = async (z, bundle) => {
             }
           }
         );
+
+      const attachmentNames = attachmentObjects.map(att => att.title);
+      const attachmentNameContainsVNChar = attachmentNames.find(name => string_helper.containsVietnameseCharacter(name));
+      if(!!attachmentNameContainsVNChar) {
+        error.throwError(z, new AttachmentNameError(attachmentNameContainsVNChar));
+      }
 
       return attachmentObjects.map((obj) => {
         obj.stashedUrl = z.dehydrateFile(hydrators.downloadFileWithAuth, {
