@@ -135,8 +135,8 @@ const perform = async (z, bundle) => {
           }
         );
 
-      const attachmentNames = attachmentObjects.map(x => x.title);
-      const attachmentNameContainsVNChar = attachmentNames.find(att => string_helper.containsVietnameseCharacter(att));
+      const attachmentNames = attachmentObjects.map(att => att.title);
+      const attachmentNameContainsVNChar = attachmentNames.find(name => string_helper.containsVietnameseCharacter(name));
       if(!!attachmentNameContainsVNChar) {
         error.throwError(z, new AttachmentNameError(attachmentNameContainsVNChar));
       }
