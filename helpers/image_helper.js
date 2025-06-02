@@ -32,7 +32,7 @@ function generateHubSpotImageUrl(folderName, fileName) {
 
 function replaceAcImages(folderName, elements, attachments) {
   var results = []
-  let acImages = elements.filter(x => x['ac:image'] != null);
+  let acImages = elements.filter((x) => x['ac:image'] != null || (x['ac:image'] && x['ac:alt'] != null && !x['ac:alt'].includes('.mp4')));
   if (acImages.length > 0) {
     acImages.forEach(acImage => {
       let p = replaceAcImage(folderName, acImage, attachments);

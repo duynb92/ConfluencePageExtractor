@@ -41,7 +41,7 @@ function replaceEmbeddedVideo(element) {
 
   function replaceEmbeddedVideos(elements) {
     var results = []
-    let embedVideos = elements.filter(x => x['a'] != null).filter(x => x[':@']['@_data-card-appearance'] == 'embed');
+    let embedVideos = elements.filter(x => x['a'] != null).filter(x => (x[':@']['@_data-card-appearance'] == 'embed') || (x['a:image'] != null && x['ac:alt'] != null && x['ac:alt'].includes('.mp4')));
     if (embedVideos.length > 0) {
       embedVideos.forEach(embedVideo => {
         let div = replaceEmbeddedVideo(embedVideo);
