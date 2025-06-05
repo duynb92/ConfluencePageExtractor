@@ -1,7 +1,9 @@
 const { XMLParser, XMLBuilder } = require('fast-xml-parser');
-const tableHelper = require('../helpers/table_helper');
-const imageHelper = require('../helpers/image_helper');
-const videoHelper = require('../helpers/video_helper');
+const tableHelper = require('../helpers/table_helper.js');
+const imageHelper = require('../helpers/image_helper.js');
+const videoHelper = require('../helpers/video_helper.js');
+const fs = require('fs');
+const he = require('he');
 
 // Mock the z.console.log function
 global.z = {
@@ -11,21 +13,17 @@ global.z = {
 };
 
 // Mock image and video helpers
-imageHelper.replaceAcImages = () => {};
+// imageHelper.replaceAcImages = () => {};
 imageHelper.replaceAcEmoticons = () => {};
 
 function options(preserveOrder) {
 	return {
 		ignoreAttributes: false,
 		preserveOrder: preserveOrder,
-		attributeNamePrefix: '',
 		allowBooleanAttributes: true,
-		parseAttributeValue: true,
-		parseTagValue: false,
+		alwaysCreateTextNode: true,
 		trimValues: false,
-		cdataPropName: '__cdata',
-		format: true,
-		indentBy: '  ',
+		unpairedTags: ['br'],
 	};
 }
 
@@ -35,21 +33,21 @@ function parseXml(pageContent, preserveOrder) {
 }
 
 function processPageContent(folderName, pageContent, attachments) {
-	const xmlElements = parseXml(pageContent, true);
-	tableHelper.addTHeadToTables(xmlElements);
-	imageHelper.replaceAcImages(folderName, xmlElements, attachments);
-	imageHelper.replaceAcEmoticons(folderName, xmlElements, attachments);
-	videoHelper.replaceEmbeddedVideos(xmlElements);
+		const decodedHubSpotPageContent = he.decode(pageContent);
+		const xmlElements = parseXml(decodedHubSpotPageContent, true);
+		tableHelper.addTHeadToTables(xmlElements);
+		imageHelper.replaceAcImages(folderName, xmlElements, attachments);
+		imageHelper.replaceAcEmoticons(folderName, xmlElements, attachments);
+		videoHelper.replaceEmbeddedVideos(folderName, xmlElements);
 
-	const builder = new XMLBuilder(options(true));
-	let newXml = builder.build(xmlElements);
+		const builder = new XMLBuilder(options(true));
+		let newXml = builder.build(xmlElements);
 
-	return newXml;
-}
+		return newXml;
+ }
 
 // Test data
 const sampleHtml = `
-
 <p>Choosing the right project management software can either empower your team or hold them back. If you&rsquo;re torn between Jira vs Trello, you&rsquo;re not alone. Both are project and task management tools built by Atlassian. But their differences are more than skin-deep.</p>
 <p>Jira is a powerful project management tool built for software development teams and complex project workflows. It&rsquo;s best known for its issue tracking features, time tracking, and support for Agile methodologies like Scrum and Kanban.</p>
 <p>Trello, on the other hand, is a user-friendly tool designed around Kanban boards. It simplifies task management for individuals and small teams working on straightforward projects with clear due dates.</p>
@@ -411,7 +409,8 @@ const sampleHtml = `
 console.log('Running test with sample HTML table...\n');
 try {
 	const result = processPageContent('TEST-123', sampleHtml, []);
-	console.log(result);
+	fs.writeFileSync('result.xml', result);
+	// console.log(result);
 	console.log('\nTest completed successfully!');
 	// write result to file
 } catch (error) {

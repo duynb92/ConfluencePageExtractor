@@ -9,18 +9,20 @@ const imageHelper = require('../helpers/image_helper.js');
 const tableHelper = require('../helpers/table_helper.js');
 const videoHelper = require('../helpers/video_helper.js');
 const string_helper = require('../helpers/string_helper.js');
+const { generateHubSpotMediaUrl } = require('../helpers/url_helper.js');
 
 const perform = async (z, bundle) => {
   function options(preserveOrder) {
     return {
-      ignoreAttributes: false,
-      preserveOrder: preserveOrder,
-      allowBooleanAttributes: true,
-      alwaysCreateTextNode: true,
-      trimValues: false
-    };
+			ignoreAttributes: false,
+			preserveOrder: preserveOrder,
+			allowBooleanAttributes: true,
+			alwaysCreateTextNode: true,
+			trimValues: false,
+			unpairedTags: ['br'],
+		};
   };
-  
+
   const site_id = bundle.inputData.site_id.split(" ")[0].trim();
   const baseUrl = `https://api.atlassian.com/ex/confluence/${site_id}`;
 
@@ -178,7 +180,7 @@ const perform = async (z, bundle) => {
     tableHelper.addTHeadToTables(xmlElements);
     imageHelper.replaceAcImages(folderName, xmlElements, attachments);
     imageHelper.replaceAcEmoticons(folderName, xmlElements, attachments);
-    videoHelper.replaceEmbeddedVideos(xmlElements);
+    videoHelper.replaceEmbeddedVideos(folderName, xmlElements);
 
     const builder = new XMLBuilder(options(true));
     let newXml = builder.build(xmlElements);
@@ -250,7 +252,7 @@ const perform = async (z, bundle) => {
       return;
     }
 
-    let coverPictureUrl = imageHelper.generateHubSpotImageUrl(issueKey, coverPictureAsAttachment.title)
+    let coverPictureUrl = generateHubSpotMediaUrl(issueKey, coverPictureAsAttachment.title)
     let data = {
       // access_token: bundle.authData.access_token,
       page,
@@ -259,7 +261,8 @@ const perform = async (z, bundle) => {
       // TODO: remove hard-code
       coverPicture: coverPictureUrl,
       processedContent: processedContent,
-      processedHubSpotPageContent: processedHubSpotPageContent
+      processedHubSpotPageContent: processedHubSpotPageContent,
+      test:"1232"
     };
     // z.console.log(data);
     return data;
