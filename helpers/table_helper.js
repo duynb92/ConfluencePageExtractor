@@ -97,6 +97,10 @@ function removeP(cell, parent) {
 
 	const paragraphContent = cell.p[0];
 
+	if (!paragraphContent || !paragraphContent['#text']) {
+		return;
+	}
+
 	// Transfer content and attributes
 	cell['#text'] = paragraphContent['#text'] || '';
 	cell[':@'] = {
