@@ -1,0 +1,57 @@
+{
+	"name": "n8n-nodes-atlassian-toolbox",
+	"version": "1.0.0",
+	"description": "n8n and Atlassian toolboxes to extract page and issue content.",
+	"license": "MIT",
+	"homepage": "https://github.com/duynb92/AtlassianToolbox",
+	"keywords": [
+		"n8n-community-node-package"
+	],
+	"author": {
+		"name": "Duy",
+		"email": "duynb92@example.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/duynb92/AtlassianToolbox.git"
+	},
+	"scripts": {
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"release": "n8n-node release",
+		"prepublishOnly": "n8n-node prerelease"
+	},
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"credentials": [
+			"dist/credentials/AtlassianToolboxOAuth2Api.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/AtlassianToolbox/AtlassianToolbox.node.js"
+		]
+	},
+	"dependencies": {
+		"fast-xml-parser": "^4.5.3",
+		"he": "^1.2.0"
+	},
+	"devDependencies": {
+		"@n8n/node-cli": "^0.18.0",
+		"@types/he": "^1.2.3",
+		"eslint": "9.32.0",
+		"prettier": "3.6.2",
+		"release-it": "^19.0.4",
+		"typescript": "5.9.2"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	},
+	"overrides": {
+		"change-case": "4.1.2"
+	}
+}
